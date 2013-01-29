@@ -1,0 +1,41 @@
+Request:
+
+<iq from='jorgedf@triviapad.com' to='trivianerds@triviapad.com' id='123456' type='lifeline'>
+  <x xmlns='service/game/lifeline' type='fifty'/>
+</iq>
+
+Responses:
+
+<iq from='jorgedf@triviapad.com' to='trivianerds@triviapad.com' id='123456' type='lifeline'>
+  <lifeline type='fifty' status='ok'>
+    <answer id='2' />
+    <answer id='4' />
+  </lifeline>
+</iq>
+
+
+
+
+<iq from='jorgedf@triviapad.com' to='trivianerds@triviapad.com' id='123456' type='lifeline'>
+  <x xmlns='service/game/lifeline' type='clairvoyance'/>
+</iq>
+
+<iq from='jorgedf@triviapad.com' to='trivianerds@triviapad.com' id='123456' type='lifeline'>
+  <lifeline type='clairvoyance' status='ok'>
+    <answer id='1' responses='5'/>
+    <answer id='2' responses='3'/>
+    <answer id='3' responses='26'/>
+    <answer id='4' responses='0'/>
+  </lifeline>
+</iq>
+
+
+
+<iq from='jorgedf@triviapad.com' to='trivianerds@triviapad.com' id='123456' type='lifeline'>
+  <x xmlns='service/game/lifeline' type='rollback' />
+  <answer id='1' time='5555'/>
+</iq>
+
+<iq from='trivianerds@triviapad.com' to='jorgedf@triviapad.com' id='123456' type='lifeline'>
+  <lifeline type='rollback' status='ok' />
+</iq>

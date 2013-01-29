@@ -1,0 +1,8 @@
+<message to='user@triviapad.com/ipad' from='bot-server@triviapad.com/bot' type='ranking' id='200111010203358'>
+  <rank type='question' count='8' total='20'>
+    <player nickname='xurde' time='1200' hit='1' score='+35' />
+    <player nickname='rlozano' time='1540' hit='1' score='+20' />
+    <player nickname='marco' time='2120' hit='1' score='+10' />
+    <player nickname='lars' time='1680' hit='0' score='-10' />
+  </rank>
+</message>

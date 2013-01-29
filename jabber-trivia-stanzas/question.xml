@@ -1,0 +1,10 @@
+<message to='user@triviapad.com/ipad' from='bot-server@triviapad.com/bot' type='question' id='12345'>
+  <question count='8' total='20' time='20000'>Hi, how are you?</question>
+  <media type='image/jpg' url='http://statics.triviapad.com/front-1/126/54931725.jpg' />
+  <answers>
+    <answer id='1'>Fine, thanks</answer>
+    <answer id='2'>Not that bad</answer>
+    <answer id='3'>Pissed off</answer>
+    <answer id='4'>Barely</answer>
+  </answers>
+</message>

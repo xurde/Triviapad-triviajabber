@@ -1,0 +1,40 @@
+Query:
+
+<message from='fulanito@dev.triviapad.com/bot' to='triviarooms@dev.triviapad.com' type='roomlist' xml:lang='en'>
+  <query xmlns='rooms#disco#items'/>
+</message>
+
+
+Response:
+
+<message from='triviarooms@dev.triviapad.com' to='fulanito@dev.triviapad.com/bot' type='roomlist' xml:lang='en'>
+  <query xmlns='rooms#disco#items'>
+    <rooms group="Trial">
+      <room name='Trivianerds' jid='trivianerds@dev.triviapad.com' topic="General" question="11" questions="15" players="16"/>
+    </rooms>
+    <rooms group="Official">
+      <room name='Triviapad' jid='triviapad@dev.triviapad.com' topic="General" question="31" questions="50" players="16" />
+      <room name='Quickie' jid='quickie@dev.triviapad.com' topic="General" question="4" questions="10" players="43" />
+      <room name='Trivia Challenge' jid='trivia-challenge@dev.triviapad.com' topic="General" question="17" questions="20" players="56"/>
+      <room name='Triviathon' jid='triviathon@dev.triviapad.com' topic="General" question="88" questions="100" players="14"/>
+    </rooms>
+  </query>
+</message>
+
+
+
+
+
+<message from='triviarooms@dev.triviapad.com' to='fulanito@dev.triviapad.com/bot' type='roomlist' xml:lang='en'>
+  <query xmlns='rooms#disco#items'>
+    <rooms group="Trial">
+      <room name='Trivianerds' jid='trivianerds@dev.triviapad.com' topic="General" question="11" questions="15" players="16"/>
+    </rooms>
+    <rooms group="Official">
+      <room name='Triviapad' jid='triviapad@dev.triviapad.com' topic="General" question="31" questions="50" players="16" />
+      <room name='Quickie' jid='quickie@dev.triviapad.com' topic="General" question="4" questions="10" players="43" />
+      <room name='Trivia Challenge' jid='trivia-challenge@dev.triviapad.com' topic="General" question="17" questions="20" players="56"/>
+      <room name='Triviathon' jid='triviathon@dev.triviapad.com' topic="General" question="88" questions="100" players="14"/>
+    </rooms>
+  </query>
+</message>

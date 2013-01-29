@@ -1,0 +1,3 @@
+<message from='user@triviapad.com/ipad' to='bot-server@triviapad.com/bot' type='answer' id='12345'>
+  <answer id='1' time='3333'>
+</message>

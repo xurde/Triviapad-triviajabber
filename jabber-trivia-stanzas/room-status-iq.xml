@@ -1,0 +1,11 @@
+Query:
+
+<iq from='jorgedf@triviapad.com' to='bot-trivianerds@triviapad.com' id='123456'>
+  <x xmlns='service/room/status' />
+</iq>
+
+
+Response:
+<iq from='jorgedf@triviapad.com' to='bot-trivianerds@triviapad.com' id='123456' type='result'>
+  <room question='9' players='99' />
+</iq>
