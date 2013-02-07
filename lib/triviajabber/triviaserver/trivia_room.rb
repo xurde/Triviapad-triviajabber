@@ -2,14 +2,16 @@
 #                                           ROOM                                                        #
 #########################################################################################################
 
-#include ObjectSpace
+require 'redis'
+
+include #ObjectSpace
 
 module TriviaRoom
 
   class Room
     
     # Config constants
-    WAIT_BEFORE_START_GAME = 30
+    WAIT_BEFORE_START_GAME = 5
     MIN_PLAYERS_TO_PLAY = 1
     
     # MUC_HOST = "rooms.raw.triviapad.com"
@@ -19,7 +21,7 @@ module TriviaRoom
     
     def initialize(room, superjclient = nil)
       
-      #ObjectSpace.define_finalizer(self, self.class.method(:finalize).to_proc)
+      ##ObjectSpace.define_finalizer(self, self.class.method(:finalize).to_proc)
       
       #Class Variables
       @status = :initialized # :initialized, :onhold, :ongame, :onpause, :onkill
@@ -33,6 +35,7 @@ module TriviaRoom
       @logger = EventLogger.new("room-#{@slug}")
       @logger.enabled = true
       $logger = @logger
+      @logger.log "This thread is being initialized...", :warn, 'Initialize'
       
       @players = TriviaActors::Players.new
       @superjclient = superjclient
@@ -49,20 +52,26 @@ module TriviaRoom
       @logger.log "This thread is being destroyed. Run for your life!!!", :info, 'Finalize'
       # Release PubSub for the Room
     end
-    
+
+    def launch
+      @logger.log "This Room has been launched", :info, 'Launch'
+      @thread = Thread.new(@slug){main_loop}
+      @status = :onhold
+    end
+
+
     def bot
       @room.bot
     end
-  
+
     def start
-      @logger.log "This thread is being started.", :info, 'Start'
-      @thread = Thread.new(@slug){main_loop}
-      @status = :onhold
+      @logger.log "A Game is about to start...", :info, 'Start'
+      @status = :oncountdown
     end
   
     def stop
       @muc.send_chat("This Room is shutting down in 10 seconds...")
-      @logger.log "This thread is being started.", :info, 'Start'
+      @logger.log "This thread is being started.", :info, 'Stop'
       sleep(10)
       #remove PubSub for this room
       #remove Room for this room
@@ -216,11 +225,11 @@ module TriviaRoom
           send_status_to_room
           #releasing objects
           ObjectSpace.garbage_collect
-        end until (@players.count >= MIN_PLAYERS_TO_PLAY)
+        end until (@players.count >= MIN_PLAYERS_TO_PLAY) || (@status == :oncountdown)
         
         #wait for more players to join
         @logger.log "Waiting for more players to join game. Starting in #{WAIT_BEFORE_START_GAME} secs...", :info, "main_loop - extra wait"
-        @status = :onwait
+        @status = :oncountdown
         @wait = WAIT_BEFORE_START_GAME
         
         #notify_status_to_players #this might became deprecated when status_to_room working
@@ -361,11 +370,11 @@ module TriviaRoom
     def muc_message_callback(msg)
       @logger.log "#{msg.from.inspect}> #{msg.body}", :debug, "muc_message_callback"
       case msg.body
-      when 'go!'
-        #start
+      when '/play'
+        start
         @logger.log "Game started by #{msg.from}", :info, "muc_message_callback"
-      when 'stop!'
-        #stop
+      when '/stop'
+        stop
         @logger.log "Game Stopped by #{msg.from}", :info, "muc_message_callback"
       end
     rescue Exception => e
@@ -391,7 +400,7 @@ module TriviaRoom
       
       def add_status_element(stanza)
         attrb = {'status' => @status.to_s, 'question' => @question, 'total' => @questions, 'players' => @players.count }
-        attrb.merge!('wait' => @wait) if @status == :onwait
+        attrb.merge!('wait' => @wait) if @status == :oncountdown
         attrb.merge!('message' => @status_message) if @status_message
         stanza.add_element 'status', attrb
         return stanza
@@ -496,11 +505,14 @@ module TriviaRoom
         @players.join_game(request.from)
         
         #store player's join (if exists)
-        p = Player.find_by_jid(request.from.strip.to_s)
+        p = Player.first(:jid => request.from.strip.to_s)
         if p
           p.joined!
           @logger.log "Storing player join (#{p.inspect})", :debug, "process_join_game_request"
+        else
+        	@logger.log "Joined unrecognized player (#{p.inspect})", :warning, "process_join_game_request"
         end
+
         
         #sending ok response
         response = Presence.new
@@ -602,9 +614,9 @@ module TriviaRoom
         
         answers = []
         answers << quest.answer
-        answers << quest.option1 if quest.option1.present?
-        answers << quest.option2 if quest.option2.present?
-        answers << quest.option3 if quest.option3.present?
+        answers << quest.option1 if !quest.option1.empty?
+        answers << quest.option2 if !quest.option2.empty?
+        answers << quest.option3 if !quest.option3.empty?
         answers.shuffle!
         
         qmsg.answers = answers
@@ -625,8 +637,8 @@ module TriviaRoom
         @responses.status = :open
         @logger.log "question message built -> #{qmsg.inspect}", :info, "build_random_question"
         return qmsg
-      rescue Exception => e
-        @logger.log "error while building question message -> #{e.message} -> #{qmsg.inspect}", :error, "build_random_question"
+      # rescue Exception => e
+      #   @logger.log "error while building question message -> #{e.message} -> #{qmsg.inspect}", :error, "build_random_question"
       end
       
       
@@ -705,15 +717,16 @@ module TriviaRoom
       
       
       
-      ### PERSISTENCE ###
+      ### STORAGE ###
       
       def create_game
-        game = Game.new
+        game = Game.create
         game.room_id = @room.id
-        game.counter = (@room.games.last ? @room.games.last.counter : 0).next
+        #game.counter = (@room.games.last ? (@room.games.last.counter || 0) : 0).next
+        game.counter = (@room.games_counter || 0).next
         game.time_start = Time.now
         if game.save
-          @logger.log "Game object created with id -> #{game.id}", :info, "create_game"
+          @logger.log "Game object created with counter id -> #{game.counter}", :info, "create_game"
           return game
         end
       rescue Exception => e
@@ -721,33 +734,37 @@ module TriviaRoom
       end
 
       def close_game
-        game = Game.find(@game.id)
+        game = Game.get(@game.id)
         game.time_end = Time.now
         game.players_max = @players.count
         game.winner_score = @players.first.score
         game.total_score = @players.sumarize_score
-        game.save!
-        @logger.log "Game object with id #{game.id} has been closed", :info, "close_game"
+        if game.save
+          @room.games_counter = game.counter
+          @room.save
+        end
+        @logger.log "Game object with counter has been closed and Room games_counter updated to #{game.counter}", :info, "close_game"
       rescue Exception => e
         @logger.log "Error while closing game object -> #{e.message} backtrace --> #{e.backtrace}", :error, "close_game"
       end
 
-      # Redis
-      def store_game
-        game = Game.find(@game.id)
+      
+      def store_game #on Redis
+        game = Game.get(@game.id)
+        gaddress = "game-#{@room.slug}"
         redis = Redis.new
         @players.each{|p|
-                        redis.zadd "game-#{@game.id.to_s}", p.score, p.nickname
-                        redis.hmset "game-#{@game.id.to_s}:#{p.nickname}", 'hits', p.hits, 'responses', p.responses
+                        redis.zadd "#{gaddress}-#{@game.counter.to_s}", p.score, p.nickname
+                        redis.hmset "#{gaddress}-#{@game.counter.to_s}:#{p.nickname}", 'hits', p.hits, 'responses', p.responses
                       }
-        @logger.log "Game properly stored on 'game-#{@game.id.to_s}' key", :info, "store_game"
+        @logger.log "Game properly stored on '#{gaddress}-#{@game.counter.to_s}' key", :info, "store_game"
       rescue Exception => e
         @logger.log "Error while storing game -> #{e.message} backtrace --> #{e.backtrace}", :error, "store_game"
       end
 
-      def store_scores
+      def store_scores #on Redis
         @logger.log "Storing scores...", :info, "store_scores"
-        game = Game.find(@game.id)
+        game = Game.get(@game.id)
         year = game.time_start.strftime("%Y")
         month = game.time_start.strftime("%Y-%m")
         week = game.time_start.strftime("%Y-%U")
@@ -785,7 +802,7 @@ module TriviaRoom
                         end
                       }
                       
-        @logger.log "Stores properly stored in: #{raddress}", :info, "store_scores"
+        @logger.log "Scores properly stored in: #{raddress}", :info, "store_scores"
       rescue Exception => e
         @logger.log "Error while storing scores -> #{e.message}. backtrace --> #{e.backtrace}", :error, "store_scores"
       end

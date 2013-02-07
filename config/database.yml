@@ -1,0 +1,14 @@
+defaults: &defaults
+  adapter: mysql
+  username: root
+  password:
+  host: localhost
+
+development:
+  adapter: mysql
+  database: triviapad
+  <<: *defaults
+
+test:
+  database: triviapad_test
+  <<: *defaults

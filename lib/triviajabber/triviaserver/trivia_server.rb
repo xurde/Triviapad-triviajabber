@@ -8,7 +8,7 @@ Thread.abort_on_exception = false
 # MAIN_BOT_PASS = "roomstrivia"
 # PUBSUB_HOST = 'pubsub.raw.triviapad.com'
 # PUBSUB_NODE = "triviapad/rooms"
-
+  
 
 module TriviaServer
   
@@ -23,6 +23,9 @@ module TriviaServer
     # @rooms -> Array[Room]
     
     def initialize
+
+      #Load Datamapper models
+      require TRIVIAJABBER_PATH + 'trivia_models'
 
       #Load room list
       @rooms = []
@@ -72,7 +75,11 @@ module TriviaServer
         end
       end
     rescue Exception => e
-      @logger.log "Excpetion while Initializing main thread: #{e.message} -- #{e.backtrace}", :fatal, 'initialize'
+      if @logger
+        @logger.log "Excpetion while Initializing main thread: #{e.message} -- #{e.backtrace}", :fatal, 'initialize'
+      else
+        puts "Excpetion while Initializing main thread: #{e.message} -- #{e.backtrace}", :fatal, 'initialize'
+      end
     end #initialize
     
     def stop
@@ -97,11 +104,11 @@ module TriviaServer
     end
     
     def create_rooms
-      roomlist = Room.find(:all, :conditions => ["status = 'A'"])
+      roomlist = Room.all( :status => 'A')
       roomlist.each{ |room|
           @logger.log "Creating room id #{room.name}", :info, 'create_rooms'
           new_room = TriviaRoom::Room.new(room, @jclient)
-          new_room.start
+          new_room.launch
           @rooms << new_room
           sleep(5)
       }
@@ -110,9 +117,9 @@ module TriviaServer
     
     
     def send_signal_to_rooms
-      roomlist = Room.find(:all, :conditions => ["status = 'A'"])
+      roomlist = Room.all( :status => 'A')
       roomlist.each{ |room|
-          if room.signal.present?
+          if room.signal && !room.signal.empty?
             r = @rooms.detect{|r| r.bot == room.bot}
             if r
               signal = room.signal

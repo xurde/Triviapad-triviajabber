@@ -11,12 +11,13 @@ class EventLogger
   def initialize(thread_string)
     @thread_string = thread_string.sub(' ', '_').downcase
     @enabled = true
-    log_file_path = "#{Rails.root}/log/#{thread_string}.log"
+    log_file_path = "./log/#{thread_string}.log"
     @logger = Logger.new(log_file_path)
     @logger.progname = thread_string
-    #@logger.datetime_format = "%d-%m-%y - %h:%m-%s"
-    #@logger.formatter = proc { |severity, datetime, progname, msg| "#{severity} :: #{datetime} :: #{progname} :: #{msg}\n"}
+    @logger.formatter = proc { |severity, datetime, progname, msg| "#{severity} :: #{datetime.strftime('%d-%m-%y %H:%M:%S')} :: #{progname} :: #{msg}\n"}
     return @logger
+  rescue
+    puts "FATAL ERROR! Can't create logfile for '#{log_file_path}'"
   end
   
   def puts(msg, evnt = :debug, context = nil)
@@ -39,20 +40,20 @@ class EventLogger
   
 
   def log(msg, evnt = :debug, context = nil)
-    text = "#{evnt.to_s.upcase} :: #{Time.now.strftime("%d-%m-%y %H:%M:%S")} :: [#{context}] -- #{msg}"
+    # text = "#{evnt.to_s.upcase} :: #{Time.now.strftime("%d-%m-%y %H:%M:%S")} :: [#{context}] -- #{msg}"
     case evnt
     when :fatal
-      @logger.fatal(text.yellow_on_red)
+      @logger.fatal(msg.yellow_on_red)
     when :error
-      @logger.error(text.red)
+      @logger.error(msg.red)
     when :warn
-      @logger.warn(text.yellow)
+      @logger.warn(msg.yellow)
     when :info
-      @logger.info(text.white)
+      @logger.info(msg.white)
     when :debug
-      @logger.debug(text.green)
+      @logger.debug(msg.green)
     else #unknown
-      @logger.unknown(context){ text }
+      @logger.unknown(context){ msg }
     end
   end
   

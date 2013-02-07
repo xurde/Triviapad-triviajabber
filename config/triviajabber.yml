@@ -1,0 +1,9 @@
+#Server config
+MAIN_BOT_USER: "triviarooms@dev.triviapad.com"
+MAIN_BOT_PASS: "roomstrivia"
+PUBSUB_HOST: 'pubsub.dev.triviapad.com'
+PUBSUB_NODE: "triviapad/rooms"
+
+#Rooms config
+MUC_HOST: "rooms.dev.triviapad.com"
+MULTICAST_HOST: "multicast.dev.triviapad.com"
