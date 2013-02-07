@@ -1,5 +1,6 @@
-#require 'boot'
-require 'lib/triviajabber/server_base'
+require './boot'
+require './config/config'
+require './lib/triviajabber/triviajabber_base'
 
 server = TriviaServer::Server.instance
 

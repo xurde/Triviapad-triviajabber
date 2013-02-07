@@ -1,4 +1,4 @@
-TRIVIAJABBER_PATH = "#{File.dirname(__FILE__)}/../triviajabber/" 
+TRIVIAJABBER_PATH = "#{File.dirname(__FILE__)}/../../triviajabber/" 
 
 #require 'rubygems'
 
@@ -24,7 +24,7 @@ require "#{TRIVIAJABBER_PATH}trivia_server/trivia_server"
 
 #Load config and make it global constants
 begin
-  File.open( "#{TRIVIAJABBER_PATH}../../config/triviajabber.yml" ){ |yml| YAML::load( yml ) }.each{|k,v| eval "#{k} = '#{v}'"}
+  File.open( "#{TRIVIAJABBER_PATH}../config/triviajabber.yml" ){ |yml| YAML::load( yml ) }.each{|k,v| eval "#{k} = '#{v}'"}
 rescue
   puts "HANDLED FATAL ERROR loading triviajabber.yml -> #{$!}"
   exit
