@@ -35,7 +35,7 @@ module TriviaRoom
       @logger = EventLogger.new("room-#{@slug}")
       @logger.enabled = true
       $logger = @logger
-      @logger.log "This thread is being initialized...", :warn, 'Initialize'
+      @logger.log "This room is being initialized...", :debug, 'Room Initialize'
       
       @players = TriviaActors::Players.new
       @superjclient = superjclient

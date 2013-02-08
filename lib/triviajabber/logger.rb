@@ -25,14 +25,16 @@ class EventLogger
       text = "[#{@thread_string.upcase}] :: #{evnt.to_s.upcase << ' :: ' if evnt} #{msg}"
       case evnt
       when :fatal
-        puts text.black_on_yellow
+        puts text.yellow_on_red
       when :error
-        puts text.on_red
+        puts text.red
       when :warn
-        puts text.cyan
+        puts text.yellow
       when :info
         puts text.white
-      else #:debug
+      when :debug
+        puts text.black_on_white
+      else
         puts text.black_on_white
       end
     end
@@ -51,7 +53,7 @@ class EventLogger
     when :info
       @logger.info(msg.white)
     when :debug
-      @logger.debug(msg.green)
+      @logger.debug(msg.black_on_white)
     else #unknown
       @logger.unknown(context){ msg }
     end
