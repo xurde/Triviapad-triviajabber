@@ -3,7 +3,7 @@ require 'dm-core'
 require 'dm-validations'
 #require 'dm-mysql-adapter'
 
-DataMapper.setup :default, YAML::load(File.open('./config/database.yml'))[APP_ENV]
+DataMapper.setup :default, YAML::load(File.open("#{SERVER_PATH}/config/database.yml"))[APP_ENV]
 
 #Load models at ./models/*
 require TRIVIAJABBER_PATH + 'models/question'

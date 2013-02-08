@@ -1,4 +1,5 @@
 require 'singleton'
+#require 'daemons'
 
 include Jabber
 Thread.abort_on_exception = false
@@ -24,6 +25,7 @@ module TriviaServer
     
     def initialize
 
+
       #Load Datamapper models
       require TRIVIAJABBER_PATH + 'trivia_models'
 
@@ -32,6 +34,7 @@ module TriviaServer
       @status = :initializing
       @logger = EventLogger.new("main-server-thread")
       @logger.log "Initializing main server thread", :debug, 'Server Initialize'
+
       @jclient = Jabber::Client.new(Jabber::JID::new(MAIN_BOT_USER))
       @logger.log "Connecting main BOT as #{MAIN_BOT_USER}...", :info, 'Initialize'
       @jclient.connect
@@ -145,7 +148,6 @@ module TriviaServer
     end
     
     def status
-      @logger.log "SERVER STATUS - #{@status} - Rooms:#{@rooms.count}".bold.yellow, :info, 'Status'
       @logger.log "SERVER STATUS - #{@status} - Rooms:#{@rooms.size}".bold.yellow, :info, 'Status'
       rooms.collect{|r|
                       @logger.log "#{r.name.white} -> #{r.info}", :info, 'Status'
