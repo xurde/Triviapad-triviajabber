@@ -6,6 +6,8 @@ gem 'mysql'
 
 gem 'datamapper'
 gem 'dm-mysql-adapter'
+gem 'dm-core'
+gem 'dm-validations'
 
 gem 'redis'
 

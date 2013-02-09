@@ -82,6 +82,8 @@ DEPENDENCIES
   capistrano
   daemons
   datamapper
+  dm-core
   dm-mysql-adapter
+  dm-validations
   mysql
   redis
