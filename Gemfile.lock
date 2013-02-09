@@ -74,6 +74,7 @@ GEM
     redis (3.0.2)
     stringex (1.5.1)
     uuidtools (2.1.3)
+    xmpp4r (0.5)
 
 PLATFORMS
   ruby
@@ -87,3 +88,4 @@ DEPENDENCIES
   dm-validations
   mysql
   redis
+  xmpp4r
