@@ -2,6 +2,7 @@ source 'http://rubygems.org'
 
 # Misc
 gem 'xmpp4r'
+gem 'colored'
 
 
 # Storage
