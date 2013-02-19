@@ -11,7 +11,7 @@ module TriviaRoom
   class Room
     
     # Config constants
-    WAIT_BEFORE_START_GAME = 5
+    WAIT_BEFORE_START_GAME = 25
     MIN_PLAYERS_TO_PLAY = 1
     
     # MUC_HOST = "rooms.raw.triviapad.com"
@@ -284,7 +284,7 @@ module TriviaRoom
              send_status_to_room
              update_room_pubsub
              
-             @logger.log "Room Info => #{self.info}", :info, "main_loop - Question loop done"
+             @logger.log self.info, :info, "main_loop - Question loop done"
              #break if @status == :onkill #kind of unpolite
           rescue Exception => e
             @logger.log "Error on game loop while question ##{q}: #{e.message} - #{e.backtrace}", :error, "main_loop - game loop"

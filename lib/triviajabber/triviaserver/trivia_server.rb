@@ -1,5 +1,4 @@
 require 'singleton'
-#require 'daemons'
 
 include Jabber
 Thread.abort_on_exception = false
@@ -80,9 +79,9 @@ module TriviaServer
       end
     rescue Exception => e
       if @logger
-        @logger.log "Excpetion while Initializing main thread: #{e.message} -- #{e.backtrace}", :fatal, 'initialize'
+        @logger.log "Exception while Initializing main thread: #{e.message} -- #{e.backtrace}", :fatal, 'initialize'
       else
-        puts "Excpetion while Initializing main thread: #{e.message} -- #{e.backtrace}", :fatal, 'initialize'
+        puts "Exception while Initializing main thread: #{e.message} -- #{e.backtrace}", :fatal, 'initialize'
       end
     end #initialize
     
@@ -161,7 +160,7 @@ module TriviaServer
         status
         send_signal_to_rooms
         sleep(SECS_LOOP_STATUS)
-        ObjectSpace.garbage_collect
+        #ObjectSpace.garbage_collect
       }
       
     end
