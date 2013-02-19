@@ -7,7 +7,7 @@ default_run_options[:pty] = true
 
 # be sure to change these
 set :application, 'triviajabber'
-set :repository,  "git@github.com:xurde/Triviapad-admin.git"
+set :repository,  "git@github.com:xurde/Triviapad-triviajabber.git"
 
 # If you aren't using Subversion to manage your source code, specify
 # your SCM below:
@@ -19,10 +19,10 @@ set :scm, :git
 #set :use_sudo, false
 set :keep_releases, 3
 
-set :environment, choose('Dev', 'Production')
+set :environment, choose('Staging', 'Production')
 
 case environment
-when 'Dev'
+when 'Staging'
   #ssh_options[:forward_agent] = true
   set :deploy_via, :remote_cache
   set :user, 'capistrano'
@@ -51,10 +51,10 @@ namespace :deploy do
   desc "Update symlinks to the current release"
   task :update_links, :roles => :app do
     #run "ln -nfs #{deploy_to}/shared/system/ #{release_path}/public/system"
-    # run "ln -nfs #{deploy_to}/shared/system/config/database.yml #{release_path}/config/database.yml"
+    run "ln -nfs #{deploy_to}/shared/system/config/database.yml #{release_path}/config/database.yml"
     # run "ln -nfs #{deploy_to}/shared/system/config/s3.yml #{release_path}/config/s3.yml"
     # run "ln -nfs #{deploy_to}/shared/system/config/unicorn.rb #{release_path}/config/unicorn.rb"
-    # run "ln -nfs #{deploy_to}/shared/system/config/triviajabber.yml #{release_path}/config/triviajabber.yml"
+    run "ln -nfs #{deploy_to}/shared/system/config/triviajabber.yml #{release_path}/config/triviajabber.yml"
   end
 
   desc "Restart passenger"
