@@ -1,7 +1,7 @@
 source 'http://rubygems.org'
 
 # Misc
-gem 'xmpp4r'
+gem 'xmpp4r', :git => 'git@github.com:xurde/xmpp4r.git'
 gem 'colored'
 
 
