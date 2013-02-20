@@ -66,7 +66,7 @@ module TriviaRoom
 
     def start
       @logger.log "A Game is about to start...", :info, 'Start'
-      @status = :oncountdown
+      @status = :onwait
     end
   
     def stop
@@ -225,11 +225,11 @@ module TriviaRoom
           send_status_to_room
           #releasing objects
           ObjectSpace.garbage_collect
-        end until (@players.count >= MIN_PLAYERS_TO_PLAY) || (@status == :oncountdown)
+        end until (@players.count >= MIN_PLAYERS_TO_PLAY) || (@status == :onwait)
         
         #wait for more players to join
         @logger.log "Waiting for more players to join game. Starting in #{WAIT_BEFORE_START_GAME} secs...", :info, "main_loop - extra wait"
-        @status = :oncountdown
+        @status = :onwait
         @wait = WAIT_BEFORE_START_GAME
         
         #notify_status_to_players #this might became deprecated when status_to_room working
@@ -400,7 +400,7 @@ module TriviaRoom
       
       def add_status_element(stanza)
         attrb = {'status' => @status.to_s, 'question' => @question, 'total' => @questions, 'players' => @players.count }
-        attrb.merge!('wait' => @wait) if @status == :oncountdown
+        attrb.merge!('wait' => @wait) if @status == :onwait
         attrb.merge!('message' => @status_message) if @status_message
         stanza.add_element 'status', attrb
         return stanza
